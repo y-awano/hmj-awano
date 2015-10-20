@@ -20,12 +20,12 @@ implements javax.servlet.Servlet {
 	protected void doGet(HttpServletRequest request,HttpServletResponse response)
 	throws ServletException, IOException {
 
-	response.setContentType("text/html");
-	PrintWriter out = response.getWriter();
-	out.println("");
-	out.println("");
-	out.println(new java.util.Date());
-	out.println("");
-	out.println("");
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		out.println("");
+		out.println("");
+		out.println(new java.util.Date());
+		out.println("");
+		out.println("");
 	}
 }
