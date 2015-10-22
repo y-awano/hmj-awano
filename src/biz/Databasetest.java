@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +20,7 @@ public class Databasetest extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException{
 
-        response.setContentType("text/html; charset=Shift_JIS");
+    	response.setContentType("text/html; charset=Shift_JIS");
         PrintWriter out = response.getWriter();
 
         out.println("<html>");
@@ -34,31 +35,40 @@ public class Databasetest extends HttpServlet {
         String password = "root";
 
         try {
+        	request.setCharacterEncoding("UTF-8");
+        	 response.setCharacterEncoding("UTF-8");
         	 Class.forName("com.mysql.jdbc.Driver");
 //            Class.forName("com.mysql.jdbc.Driver").newInstance();
             conn = DriverManager.getConnection(url, user, password);
-            String p ="ppppppppp";
+            String namae =(String)request.getParameter("name");
+            String msg =(String)request.getParameter("msg");
 
             Statement stmt = conn.createStatement();
             String sqlinsert = "insert into test.samplekeizban(name,posting_context) values(?,?)";
             PreparedStatement pstmt = conn.prepareStatement(sqlinsert);
-            pstmt.setString(1, "prepr");
-            pstmt.setString(2, p);
+            pstmt.setString(1, namae);
+            pstmt.setString(2, msg);
             pstmt.executeUpdate();
 
             String sql = "SELECT name,posting_date,posting_context FROM test.samplekeizban";
             ResultSet rs = stmt.executeQuery(sql);
-
+            ArrayList<String> ar = new ArrayList<String>();
 
 
             while(rs.next()){
+
                 String name = rs.getString("name");
                 String posting_date = rs.getString("posting_date");
                 String posting_context = rs.getString("posting_context");
-                out.println("<p>");
-                out.println("名前:" + name + ", 投稿時間:" + posting_date + ", 投稿内容:" + posting_context);
-                out.println("</p>");
+//                ar.add(name,posting_date,posting_context);
+//                out.println("<p>");
+//                out.println("名前:" + name + ", 投稿時間:" + posting_date + ", 投稿内容:" + posting_context);
+//                out.println("</p>");
             }
+
+//            ServletContext context = this.getServletContext();
+//  		  RequestDispatcher dispatcher = context.getRequestDispatcher("/keiziban.jsp");
+//  		  dispatcher.forward(request,response);
 
             rs.close();
             stmt.close();
