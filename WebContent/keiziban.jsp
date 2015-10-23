@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<jsp:useBean class= "biz.KeizibanBean" id="List" scope="request" />
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -16,14 +18,16 @@
         <input type="submit">
     </form>
 
-   <%
-      String msg = (String)session.getAttribute("message");
-      if (msg == null || msg.equals("")) {
-        out.println("<br/>※お名前を入力ください。<br/>");
-      } else {
-        out.println("<br/><h3>" + msg + "</h3><br/>");
-      }
-    %>
+ <c:forEach var="" items="${List}">
+<c:out value="${List}"/>
+</c:forEach>
+
+<%
+   for(int i=0;i<List.size();i++){
+//	   ${list[i]};
+   }
+%>
+
 
   </body>
 </html>
