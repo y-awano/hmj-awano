@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -52,23 +54,34 @@ public class Databasetest extends HttpServlet {
 
             String sql = "SELECT name,posting_date,posting_context FROM test.samplekeizban";
             ResultSet rs = stmt.executeQuery(sql);
-            ArrayList<String> ar = new ArrayList<String>();
+//            ArrayList<String> ar = new ArrayList<String>();
+            ArrayList<KeizibanBean>  list  =  new  ArrayList<KeizibanBean>();
 
 
             while(rs.next()){
 
-                String name = rs.getString("name");
-                String posting_date = rs.getString("posting_date");
-                String posting_context = rs.getString("posting_context");
-//                ar.add(name,posting_date,posting_context);
+
+
+            	KeizibanBean  kei  =  new  KeizibanBean();
+            	  kei.setName("name");
+            	  kei.setPosting_date("posting_date");
+            	  kei.setPosting_context("posting_context");
+
+            	  list.add(kei);
+
+//                String name = rs.getString("name");
+//                String posting_date = rs.getString("posting_date");
+//                String posting_context = rs.getString("posting_context");
+////                ar.add(name,posting_date,posting_context);
 //                out.println("<p>");
 //                out.println("名前:" + name + ", 投稿時間:" + posting_date + ", 投稿内容:" + posting_context);
 //                out.println("</p>");
             }
 
-//            ServletContext context = this.getServletContext();
-//  		  RequestDispatcher dispatcher = context.getRequestDispatcher("/keiziban.jsp");
-//  		  dispatcher.forward(request,response);
+            ServletContext context = this.getServletContext();
+  		  RequestDispatcher dispatcher = context.getRequestDispatcher("/keiziban.jsp");
+  		request.setAttribute("List", list);
+  		  dispatcher.forward(request,response);
 
             rs.close();
             stmt.close();
