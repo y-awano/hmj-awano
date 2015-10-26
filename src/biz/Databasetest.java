@@ -23,6 +23,7 @@ public class Databasetest extends HttpServlet {
         throws IOException, ServletException{
 
     	response.setContentType("text/html; charset=Shift_JIS");
+    	request.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
         out.println("<html>");
@@ -37,8 +38,7 @@ public class Databasetest extends HttpServlet {
         String password = "root";
 
         try {
-        	request.setCharacterEncoding("UTF-8");
-        	 response.setCharacterEncoding("UTF-8");
+
         	 Class.forName("com.mysql.jdbc.Driver");
 //            Class.forName("com.mysql.jdbc.Driver").newInstance();
             conn = DriverManager.getConnection(url, user, password);
@@ -59,28 +59,29 @@ public class Databasetest extends HttpServlet {
 
 
             while(rs.next()){
-
+            	System.out.println(rs.getString("name"));
 
 
             	KeizibanBean  kei  =  new  KeizibanBean();
-            	  kei.setName("name");
-            	  kei.setPosting_date("posting_date");
-            	  kei.setPosting_context("posting_context");
+            	  kei.setName(rs.getString("name"));
+            	  kei.setPosting_date(rs.getString("posting_date"));
+            	  kei.setPosting_context( rs.getString("posting_context"));
 
             	  list.add(kei);
 
-//                String name = rs.getString("name");
-//                String posting_date = rs.getString("posting_date");
-//                String posting_context = rs.getString("posting_context");
-////                ar.add(name,posting_date,posting_context);
-//                out.println("<p>");
-//                out.println("名前:" + name + ", 投稿時間:" + posting_date + ", 投稿内容:" + posting_context);
-//                out.println("</p>");
+                String name = rs.getString("name");
+                String posting_date = rs.getString("posting_date");
+                String posting_context = rs.getString("posting_context");
+//                ar.add(name,posting_date,posting_context);
+                out.println("<p>");
+                out.println("名前:" + name + ", 投稿時間:" + posting_date + ", 投稿内容:" + posting_context);
+                out.println("</p>");
             }
 
             ServletContext context = this.getServletContext();
+
   		  RequestDispatcher dispatcher = context.getRequestDispatcher("/keiziban.jsp");
-  		request.setAttribute("List", list);
+  		request.setAttribute("KeizibanBean", list);
   		  dispatcher.forward(request,response);
 
             rs.close();

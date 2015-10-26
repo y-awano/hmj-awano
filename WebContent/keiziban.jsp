@@ -1,3 +1,4 @@
+<%@page import="biz.KeizibanBean"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
@@ -18,15 +19,8 @@
         <input type="submit">
     </form>
 
- <c:forEach var="" items="${List}">
-<c:out value="${List}"/>
-</c:forEach>
 
-<%
-   for(int i=0;i<List.size();i++){
-//	   ${list[i]};
-   }
-%>
+<%=request.getAttribute("KeizibanBean")%>
 
 
   </body>
