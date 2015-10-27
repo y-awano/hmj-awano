@@ -22,7 +22,7 @@ public class Databasetest extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException{
 
-    	response.setContentType("text/html; charset=Shift_JIS");
+    	response.setContentType("text/html; charset=UTF-8");
     	request.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
@@ -59,13 +59,16 @@ public class Databasetest extends HttpServlet {
 
 
             while(rs.next()){
-            	System.out.println(rs.getString("name"));
+
 
 
             	KeizibanBean  kei  =  new  KeizibanBean();
             	  kei.setName(rs.getString("name"));
             	  kei.setPosting_date(rs.getString("posting_date"));
             	  kei.setPosting_context( rs.getString("posting_context"));
+            	  System.out.println(rs.getString("name"));
+            	  System.out.println(kei);
+
 
             	  list.add(kei);
 
@@ -81,7 +84,7 @@ public class Databasetest extends HttpServlet {
             ServletContext context = this.getServletContext();
 
   		  RequestDispatcher dispatcher = context.getRequestDispatcher("/keiziban.jsp");
-  		request.setAttribute("KeizibanBean", list);
+              		request.setAttribute("KeizibanBean", list);
   		  dispatcher.forward(request,response);
 
             rs.close();
