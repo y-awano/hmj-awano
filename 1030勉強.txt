@@ -1,0 +1,280 @@
+﻿昨日と範囲が重複していますが、理解が浅い部分の復習も兼ねてp52から
+
+■コンストラクタは継承されない
+class Rectangle{
+	int width;
+	int height;
+	Rectangle(){
+		width = 0;
+		height = 0;
+	}
+	Rectangle(int width; int height){
+		this.width = width;
+		this.height = height;
+	}
+	...
+}
+
+class NmaedRectangle extends Rectangle{
+	String name;
+	NamedRectangle(){
+		name = "NO NAME";
+	}
+	NamedRectangle(String name){
+		this.name = name;
+	}
+}
+上のような宣言がなされているとき、以下は正しいコンストラクタの呼び出し(インスタンスの生成)です。
+①Rectangle r = new Rectangle();
+②Rectangle s = new Rectangle(123,45);
+③Rectangle nr = new NamedRectangle();
+④Rectangle ns = new NamedRectangle("結城");
+しかし、次の呼び出しはコンパイルエラーになります。
+②Rectangle s = new Rectangle(123,45);　×
+エラーになるのは、intの引数を2つ持ったコンストラクタは、Rectangleクラスにはありますが、NamedRectangleクラスにはないからです。
+　→②が呼び出せてしまうと、NamedRectangleのnameフィールドの初期化が行われないことになってしまうから？
+
+■コンストラクタの自動的な呼び出し
+class NmaedRectangle extends Rectangle{
+	String name;
+	NamedRectangle(){
+		name = "NO NAME";
+	}
+	NamedRectangle(String name){
+		this.name = name;
+	}
+}
+コンストラクタNamedRectangle()の中では、フィールドnameは"NO NAME"で初期化されています。
+けれども、スーパークラスから継承されているはずのwidth、heightは初期化されていません。
+なぜなら、スーパークラスの引数なしコンストラクタは自動的に呼び出されると決まっているからです。
+
+■super():スーパークラスのコンストラクタの明示的な呼び出し
+コンストラクタのはじめには、スーパークラスの引数なしのコンストラクタが自動的に挿入されるといいました。
+でもコンストラクタの中からスーパークラスの引数付コンストラクタを呼び出したいときもあります。例えば
+NamedRectangle nr = new NamedRectangle("結城");
+という名前付きのインスタンスを作るときは、長方形の大きさをwidth = 200(幅が200)で、height = 32(高さが32)にしたいとします(「結城」という名前を表示する領域として)。
+もし、スーパークラスの引数なしのコンストラクタが自動的に挿入されてしまったら、Rectangle()の中で、width = 0, height = 0にされてしまいます・
+Java言語には、スーパークラスのコンストラクタを呼び出す表記法が用意されています。それが
+super();
+です。引数付のコンストラクタを呼び出す場合には、スーパークラスに対する引数をそのまま書いて、
+super(200, 32);
+のように書きます。すると、NamedRectangleのコンストラクタは次のように記述できます。
+NamedRectangle(Strign name){
+	super(200, 32); //スーパークラスの引数付コンストラクタの呼び出し
+	this.name = name; 
+}
+前節で述べた「スーパークラスの引数なしコンストラクタの呼び出し」を明示的にプログラムで書けば、以下のようになります。
+NamedRectangle(){
+	super();
+	name = "NO NAME";
+}
+
+■this():自分のクラスのコンストラクタの明示的な呼び出し
+class NamedRectangle extends REctangle{
+	String name;
+	NamedRectangle(){
+		this("NO NAME");
+	}
+	NamedRectangle(String name){
+		super(200, 32);
+		this.name = name;	
+	}
+}
+コンストラクタNameRectangle()が書き換えられていますね。これまでは自分で
+name = "NO NAME";
+という代入を行っていましたが、今度は
+this("NO NAME");
+という呼び出しに変わっています。これは、もう一つのコンストラクタであるNamedRectangle(String name)の方を呼び出しているのですね。
+this()を使うと、コンストラクタがたくさんあるときでも初期化処理を上手く共通化することができます。
+上記の処理の流れは以下のようになります。
+3行目のNamedRectangle()が呼び出される。
+4行目のthis("NO NAME");の呼び出しが起きる。
+↓
+　6行目のNamedRectangle(String name)が呼び出される。
+　　仮引数nameの値は"NO NAME"である。
+　　7行目のsuper(200, 32);の呼び出しが起こる。
+　　↓
+　　　スーパークラスのコンストラクタであるRectangle(int width, int height)が呼び出される。
+　　　　仮引数widthの値は200,heightの値は32である。
+　　　　自分のフィールドwidthが200,heightが32で初期化される。
+　　　　戻る。
+　　　　↓
+　　8行目で、自分のフィールドnameに仮引数namaの値"NO NAME"を代入する。
+　　戻る。
+　　↓
+　戻る。
+
+■継承とIS-A関係
+○○は○○の一種であるという関係のことを、オブジェクト指向の用語でIS-A関係といいます。
+
+■合成とHAS-A関係
+NamedRectangleクラスは、String型のフィールドを持っていました。String型のインスタンスを自分の名前として持っていたわけです。
+インスタンスをフィールドとして持つと、そのインスタンスを自分の物として扱うことができます。このような関係をHAS-A関係と呼びます。「合成」と呼ぶ場合もあります。
+NamedRectangleはRectangleとIS-A関係にあり、さらにStringとHAS-A関係にあるといえるでしょう。
+NamedRectangleはRectangleの持っているメソッドを継承して利用することができますし、自分の構成部品としてStringを利用することができるわけです。
+
+■オーバーライド
+クラスは、スーパークラスのメソッドを継承します。プログラマは新たなメソッドを追加するだけでなく、継承したフィールドやメソッドを変更することもできます。
+このような変更をメソッドのオーバーライド(override)と呼びます。
+あるメソッドをオーバーライドしたい時には、スーパークラスのメソッドと同じメソッドを宣言すればokです。
+class Rectangle{
+	...
+	void setSize(int width, int height){ // (1)
+		...
+	}
+}
+
+class NamedRectangle extends Rectangle{
+	...
+	@override
+	void setSize(int width, int height){ // (2)
+		...
+	}
+}
+このとき、次のようにしてsetSizeメソッドを呼び出すと、NamedRectangleのsetSizeメソッド(2)が呼び出されます。
+RectangleのsetSizeメソッド(1)は呼び出されません。
+NamedRectangle nr = new NamedRectangle(); // NamedRectangleのインスタンスの生成
+nr.setSize(123,45); // NamedRectangleのsetSizeメソッド(2)が生成される
+
+■シグニチャ
+メソッドをオーバーライドするには、サブクラスで「同じメソッド」を宣言する必要があります。ここで言う「同じ」とは
+・メソッドの名前が等しい
+・引数列の型が等しい
+ことを意味します。この「メソッド名と引数列の型」のことをメソッドのシグニチャ(signature)といいます。
+
+■コントラクトは変更してはいけない
+あるクラスの「フィールドとメソッドが持つ意味」をコントラクト（契約）と呼びます。コントラクトは、そのクラスの振る舞いを規定するものです。
+例えば、要素を最後に追加するappendというメソッドがスーパークラスにあったとします。
+このとき、そのappendメソッドを「追加(append)」という意味ではなく
+「アプリケーション(app)の終了(end)」という意味に変更するようなオーバーライドをしてはいけません。
+それは、クラスを利用するプログラマを混乱させるからです。
+
+■オーバーライドとオーバーロード
+オーバーライドは(override)は、オーバーロード(overload)ととても似ている単語です。しかし、意味するものは全く違います。
+オーバーライドはスーパークラスのメソッドを変更することで、オーバーロードは同じ名前の異なる引数を持つメソッドを多数宣言することです。
+オーバーロードは、似た機能を持つたくさんのメソッドに対して同じ名前を付けることを意味します。「多重定義」とも呼ばれます。
+オーバーロードのロード(load)は「負荷」のことです。1つの名前にたくさんのメソッドという負荷を背負わせているのです。
+
+■ハイディング
+スーパークラスが持っているフィールドと同じ名前のフィールドを宣言したとき、そのフィールドはスーパークラスのフィールドの名前を隠すことになります。
+これをフィールドのハイディング(hiding)と呼びます。
+
+■多態性とオーバーライド
+サブクラスのインスタンスは、スーパークラスのインスタンスをみなすことができます。例えば、NamedRectangleのインスタンスを次のように作ったとしましょう。
+NamedRectangle nr = new NamedRectangle("結城");
+このとき、次のようにnrをRectangle型の変数に代入することができます。
+Rectangle r = nr;
+つまり、NamedRectangleのインスタンスをRectangleのインスタンスをしてみなしている訳です。
+このように同じインスタンスが変数nr経由ではNamedRectangleとして扱われ、また、変数r経由ではRectangleとして扱われるわけです。
+このことを、多態性(ポリモルフィズム)と呼びます。
+ポリモルフィズム(polymorphism)とは、「複数(poly-)形態を持つこと(morphism)」を意味します。
+ここで、フィールドを見てみましょう。nrとrのどちらにもNamedRectangleのインスタンスに代入されているとすると、フィールドを参照する式の意味は次のようになります。
+nr.name   名前が得られる
+nr.width  幅が得られる
+nr.height 高さが得られる
+r.name    コンパイルエラー(Rectangleにnameフィールドはない)
+r.width   幅が得られる
+r.height  高さが得られる
+たとえrに代入されているのが、実際にはNamedRectangleのインスタンスであっても、r経由でnameフィールドにアクセスすることはできません。
+コンパイラはあくまでrをRectangle型だと思っており、Rectangle型にnameというフィールドはないからです。
+また、次のメソッドについても見てみましょう。
+r.setSize(123, 45);
+という呼び出しは何を意味するでしょうか。通常は、RectangleのsetSizeメソッドが呼び出されます。
+けれど、もしもNamedRectangleにsetSizeメソッドが宣言されていたら(つまりオーバーライドされていたら)、NamedRectangleの方のsetSizeメソッドが呼び出されます。
+変数rはRectangle型です。でも、r.setSizeというメソッドの呼び出しで実際に呼び出されるメソッドは、その時代入しているインスタンスのクラスによって決まります。
+
+■finalメソッドはオーバーライドできない
+メソッドはスーパークラスからサブクラスに継承されます。
+finalが付いたメソッド(finalメソッド)もサブクラスに継承されますが、サブクラスではそのメソッドをオーバーライドすることはできません。
+プログラマが「このメソッドはサブクラスで変更してほしくない」と思った時にfinalメソッドにするのです。
+
+■継承とアクセス制御
+スーパークラスではprivateと書かれたフィールドやメソッドは、サブクラスに継承されません。
+privateという修飾子は、他のクラスから利用させたくないフィールドやメソッドに対して付けるものです。
+privateと書かれたフィールドやメソッドは、そのクラス内部だけで使うことを前提としているのです。親が子供に託さなかった財産ですね。
+このように、名前の使用(アクセス)を許可したり禁止したりする機構のことをアクセス制御(access control)と呼びます。
+
+■アクセスメソッド
+フィールドをprivateにしておくと、サブクラスからだけでなく、他のどのクラスからもそのフィールドは見えません。
+つまり、privateなフィールドは、他のクラスには隠されている情報なのです。
+詳細を隠すことで、そのクラスのプログラミングがやりやすくなります。privateなフィールドに関する変更が、他のクラスに直接の影響を及ぼすことがないからです。
+このことを情報隠蔽といいます。
+
+■抽象クラス
+メソッドの名前と引数の型だけが定まっていて、その実体(実装)がないメソッドのことを抽象メソッドあるいはabstractメソッドと呼びます。
+抽象メソッドを含んでいるクラスを抽象クラスあるいはabstractクラスと呼びます。抽象クラスはインスタンスを作ることができません。
+abstract class Player{ //抽象クラス 
+	public abstract void play(); //抽象メソッド
+	public void loop(int n){
+		for(int i = 0; i < n; i++){
+			play();
+		}
+	}
+}
+Playerクラスは、playとloopという2つのメソッドを持っています。
+playは、本体がありませんので抽象メソッドです。loopは、本体がありますので抽象メソッドではありません。
+抽象メソッドplayを含んでいるので、Playerクラスは抽象クラスになります。
+playメソッドは「何かをする」メソッドです。でもなにをするかまではPlayerクラスには書いてありません。
+一方、loopメソッドには本体があります。引数nで指定された回数だけplayメソッドを呼び出しています。
+つまりloopは「playで何をするのかはさておき、それをn回繰り返す」というメソッドなのです。
+playが具体的に何をするかは、Playerのサブクラスが決めます。
+例えば、文字列を表示するサブクラスのTextPlayerは以下のように書くことができます。
+public class TextPlayer extends Player{
+	String text;
+	public TextPlayer(String text){
+		this.text = text;
+	}
+	@Override
+	public void play(){
+		System.out.println(text);
+	}
+	public static void main(String[] args){
+		TextPlayer player = new TextPlayer("こんにちは");
+		player.loop(3);
+	}
+}
+TextPlayerでは、スーパークラスのPlayerでabstractになっていたplayというメソッドを実装しています。
+TextPlayerではplayメソッドはもう抽象メソッドではありません。したがって、TwxtPlayerメソッドは抽象クラスではありません。
+
+■例外とは
+Java言語の例外(exception)は、プログラムの誤りを通知し、適切なエラー処理を行うための機構です。
+例えば、次のような状況を考えてください。
+(1)配列の長さを越えた添字で要素を参照しようとした
+(2)ファイルをオープンしようとしたが、ファイルが見つからなかった
+(3)メソッドに与えられた引数が異常な値だった
+(4)オブジェクトを作りすぎてメモリが足りなくなった
+プログラムが動くとき、これらの状況はよく起きるものです。
+プログラマは、このような状況にも適切な振る舞い(エラー処理)をするプログラムを書く必要があります。
+Java言語は、そのための機構として「例外」を備えているのです。
+
+■例外のキャッチ
+例外が起きたことを「例外が投げられた」または「例外がthrowされた」といいます。
+また、例外の処理を行うことを「例外を受ける」または「例外をcatchする」といいます。以下サンプル
+public class ExceptionTest{
+	public static void main(String[] args){
+		int[] myarray = new int[3];
+		try{
+			System.out.println("代入します");
+			myarray[100] = 0;
+			System.out.println("代入しました");
+		}catch(ArrayIndexOutOfBoundsException e){
+			System.out.println("代入できませんでした");
+			System.out.println("例外は" + e + "です");
+		}
+		System.out.println("終了します");
+	}
+}
+①6行目の代入で例外が投げられ、実行が中断される
+②その例外は8行目のcatch節で受け止められる
+③catchのブロックの中の文が実行される
+④catchブロックの実行が終わると、try文全体が終わる
+⑤例外処理を終えて、通常の処理に戻る
+
+■コールスタック
+例外が起こった時に、制御が非常に遠いところにいきなり移ってしまう可能性があるので、メソッドの呼び出しと例外の仕組みをよく理解していないと、
+自分が作っているプログラムの動きを見失ってしまう恐れがあります。
+どの順番で、そのメソッドが呼び起されて現在の所まで至ったのかをよく理解していないと、
+「ここで例外が起こった時に、どこでキャッチされるのか」把握できないことになります。
+このメソッドの呼び出しの積み重ねのことをコールスタックといいます。
+コールスタック(call stack)とは、「呼び出し(call)」が「積み重なったもの(stack)」という意味です。
+
